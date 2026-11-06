@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Periodic Table Explorer</title>
+<meta name="description" content="Explore the Elements. Discover the Science. An interactive periodic table of all 118 elements.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><text y=%2226%22 font-size=%2226%22>⚛</text></svg>">
+<style>
+:root{--bg:#070b16;--bg2:#0d1426;--card:#121a30;--tx:#e8edf8;--mu:#8b97b5;--bd:#26335a;--ac:#4cc9f0;--gl:#14264d;
+--c0:#ff6b6b;--c1:#ffa94d;--c2:#4dabf7;--c3:#69db7c;--c4:#38d9a9;--c5:#ffd43b;--c6:#da77f2;--c7:#9775fa;--c8:#ff8cc6;--c9:#adb5bd}
+[data-theme=light]{--bg:#f1f4fb;--bg2:#fff;--card:#fff;--tx:#14203b;--mu:#566285;--bd:#cdd6ea;--ac:#0a7ea4;--gl:#dbe6ff;
+--c0:#e03131;--c1:#d9480f;--c2:#1971c2;--c3:#2b8a3e;--c4:#087f5b;--c5:#a07800;--c6:#ae3ec9;--c7:#6741d9;--c8:#c2255c;--c9:#5c677d}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(circle at 20% -10%,var(--gl) 0,var(--bg) 55%) fixed;color:var(--tx);overflow-x:hidden}
+button,input,select{font:inherit;color:var(--tx)}
+button{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:9px 14px;min-height:40px;cursor:pointer;transition:border-color .15s,transform .15s,box-shadow .15s}
+button:hover:not(:disabled){border-color:var(--ac)}button:active:not(:disabled){transform:scale(.96)}button:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;padding:12px 20px;border-bottom:1px solid var(--bd);background:var(--bg2)}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto}.brand svg{width:40px;height:40px;color:var(--ac)}
+h1{margin:0;font-size:20px;letter-spacing:.2px}.brand p{margin:0;color:var(--mu);font-size:12.5px}
+.sr{position:relative;flex:1 1 240px;max-width:400px}
+#q{width:100%;min-height:40px;padding:8px 40px 8px 14px;border-radius:10px;border:1px solid var(--bd);background:var(--card)}
+#qc{position:absolute;right:3px;top:3px;min-height:34px;padding:4px 10px;border:0;background:none}
+#msg{min-height:30px;padding:8px 20px 0;color:var(--mu);font-size:13px}
+main{padding:6px 20px 0}.tw{overflow-x:auto;padding:14px 8px 18px}
+.hint{display:none;margin:0 0 4px;color:var(--mu);font-size:12px}
+#pt{display:grid;grid-template-columns:26px repeat(18,minmax(54px,1fr));grid-template-rows:20px repeat(7,auto) 12px repeat(2,auto);gap:4px;min-width:1080px}
+.gl{display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:11px}
+.ph{display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px dashed var(--cc);color:var(--cc);font-size:10px}
+.el{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:64px;padding:12px 1px 3px;border-radius:8px;cursor:pointer;
+background:color-mix(in srgb,var(--cc) 16%,var(--card));border:1px solid color-mix(in srgb,var(--cc) 45%,transparent);
+animation:in .45s backwards;animation-delay:calc(var(--i)*5ms);transition:transform .15s,box-shadow .15s,opacity .25s,filter .25s}
+.el:hover,.el:focus-visible{transform:scale(1.18);z-index:5;box-shadow:0 0 14px var(--cc),inset 0 0 0 1px var(--cc);outline:0}
+.el b{font-size:18px;line-height:1.1;color:var(--cc);transition:font-size .15s}.el:hover b,.el:focus-visible b{font-size:23px}
+.n{position:absolute;top:2px;left:4px;font-size:9px;color:var(--mu)}
+.nm,.ms{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:8.5px}.ms{color:var(--mu)}
+.dim{opacity:.16;filter:saturate(.2)}.hit{box-shadow:0 0 0 2px var(--tx),0 0 16px var(--cc)}
+.sel{box-shadow:0 0 0 2px var(--ac),0 0 20px var(--ac);transform:scale(1.1);z-index:4}
+.bar{display:flex;flex-wrap:wrap;gap:8px;padding:4px 20px 0}.lg{display:inline-flex;align-items:center;gap:7px;border-radius:999px;font-size:12.5px;padding:6px 12px}
+.lg i{width:10px;height:10px;border-radius:50%;background:var(--cc)}.lg.on{border-color:var(--cc);box-shadow:0 0 0 1px var(--cc)}
+.act{padding:14px 20px 4px}.act button{background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 30%,var(--card)),var(--card));font-weight:600}
+footer{margin-top:28px;padding:22px 20px;border-top:1px solid var(--bd);background:var(--bg2);color:var(--mu);font-size:12.5px;text-align:center}footer p{margin:4px auto;max-width:760px}footer strong{color:var(--tx)}
+#tip{position:fixed;left:0;top:0;z-index:50;pointer-events:none;padding:7px 11px;border-radius:9px;background:var(--bg2);border:1px solid var(--ac);box-shadow:0 6px 20px #0006;font-size:12.5px}#tip span{color:var(--mu)}
+dialog{border:1px solid var(--bd);border-radius:18px;background:var(--bg2);color:var(--tx);padding:0;width:min(580px,94vw);max-height:90vh;overflow:auto}
+dialog::backdrop{background:rgba(3,6,14,.65);backdrop-filter:blur(3px)}
+.in{padding:22px;animation:in .25s}.x{float:right;position:sticky;top:0;min-height:36px;padding:4px 11px}
+h2{margin:0 0 4px;font-size:22px}h3{margin:14px 0}.mu,.note{color:var(--mu);font-size:12.5px}
+.hd{display:flex;align-items:center;gap:16px;margin-bottom:14px}.hd p{margin:0;color:var(--cc);font-weight:600}
+.tile{position:relative;width:84px;height:84px;display:flex;align-items:center;justify-content:center;border-radius:14px;border:2px solid var(--cc);background:color-mix(in srgb,var(--cc) 18%,var(--card));box-shadow:0 0 22px color-mix(in srgb,var(--cc) 50%,transparent)}
+.tile b{font-size:38px;color:var(--cc)}.tile span{position:absolute;top:5px;left:8px;font-size:12px;color:var(--mu)}
+dl{display:grid;grid-template-columns:minmax(120px,38%) 1fr;margin:0}dt,dd{margin:0;padding:7px 0;border-bottom:1px solid var(--bd)}dt{color:var(--mu)}dd{padding-left:10px;overflow-wrap:anywhere}
+.ac{display:flex;gap:8px;justify-content:space-between;margin-top:14px}
+.cs{display:flex;align-items:center;gap:10px;margin:12px 0}.cs select{flex:1;min-width:0;min-height:40px;border-radius:10px;border:1px solid var(--bd);background:var(--card);padding:6px}
+.tb{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}td:first-child{color:var(--mu)}
+.op{display:grid;gap:8px}.op .ok{background:#2b8a3e;border-color:#69db7c;color:#fff}.op .bad{background:#c92a2a;border-color:#ff8787;color:#fff}
+.sc{font-size:40px;font-weight:700;color:var(--ac)}.rv{margin:0;padding:0;list-style:none;font-size:13px}.rv li{padding:6px 0;border-bottom:1px solid var(--bd)}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+@media(max-width:1150px){.hint{display:block}}
+@media(max-width:600px){header,main,.bar,.act,#msg{padding-left:12px;padding-right:12px}.brand p{display:none}dl{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand">
+  <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><ellipse cx="24" cy="24" rx="20" ry="8"/><ellipse cx="24" cy="24" rx="20" ry="8" transform="rotate(60 24 24)"/><ellipse cx="24" cy="24" rx="20" ry="8" transform="rotate(120 24 24)"/><circle cx="24" cy="24" r="3.5" fill="currentColor"/></svg>
+  <div><h1>Periodic Table Explorer</h1><p>Explore the Elements. Discover the Science.</p></div>
+ </div>
+ <div class="sr"><input id="q" type="search" placeholder="Search name, symbol or number" autocomplete="off" aria-label="Search elements"><button id="qc" aria-label="Clear search" hidden>✕</button></div>
+ <button id="th">Theme</button><button id="ab">About</button>
+</header>
+<div id="msg" aria-live="polite"></div>
+<main>
+ <p class="hint">↔ Swipe sideways to see all 18 groups</p>
+ <div class="tw"><div id="pt"></div></div>
+</main>
+<div class="bar" id="lgd"></div>
+<div class="act bar"><button id="rn">Discover a Random Element</button><button id="qz">Take the Quiz</button><button id="cp">Compare Elements</button></div>
+<footer>
+ <p><strong>Periodic Table Explorer</strong> – built for education. Values are provided for learning and may contain errors; check primary references before relying on them.</p>
+ <p>Reference sources: IUPAC, NIST Chemistry WebBook, Royal Society of Chemistry Periodic Table, PubChem.</p>
+ <p>© 2026 Periodic Table Explorer. Built for curious minds.</p>
+</footer>
+<div id="tip" hidden></div>
+<dialog id="dlg"></dialog>
+
+<script>
+// name symbol-less: "Sym Name mass electronegativity density meltK boilK" ("-" = unknown). Density: g/cm³ (gases: g/L). Mass in [ ] = no standard atomic weight (mass number of most stable isotope).
+const DATA=`H Hydrogen 1.008 2.20 .0899 13.99 20.271
+He Helium 4.0026 - .1786 - 4.222
+Li Lithium 6.94 0.98 0.534 453.65 1603
+Be Beryllium 9.0122 1.57 1.85 1560 2742
+B Boron 10.81 2.04 2.34 2349 4200
+C Carbon 12.011 2.55 2.267 - -
+N Nitrogen 14.007 3.04 1.251 63.15 77.36
+O Oxygen 15.999 3.44 1.429 54.36 90.20
+F Fluorine 18.998 3.98 1.696 53.53 85.03
+Ne Neon 20.180 - .9 24.56 27.07
+Na Sodium 22.990 0.93 0.971 370.87 1156
+Mg Magnesium 24.305 1.31 1.738 923 1363
+Al Aluminium 26.982 1.61 2.70 933.47 2792
+Si Silicon 28.085 1.90 2.329 1687 3538
+P Phosphorus 30.974 2.19 1.82 317.3 553.6
+S Sulfur 32.06 2.58 2.07 388.36 717.8
+Cl Chlorine 35.45 3.16 3.214 171.6 239.11
+Ar Argon 39.95 - 1.784 83.8 87.3
+K Potassium 39.098 0.82 0.862 336.53 1032
+Ca Calcium 40.078 1.00 1.55 1115 1757
+Sc Scandium 44.956 1.36 2.989 1814 3109
+Ti Titanium 47.867 1.54 4.54 1941 3560
+V Vanadium 50.942 1.63 6.11 2183 3680
+Cr Chromium 51.996 1.66 7.15 2180 2944
+Mn Manganese 54.938 1.55 7.44 1519 2334
+Fe Iron 55.845 1.83 7.874 1811 3134
+Co Cobalt 58.933 1.88 8.86 1768 3200
+Ni Nickel 58.693 1.91 8.912 1728 3186
+Cu Copper 63.546 1.90 8.96 1357.77 2835
+Zn Zinc 65.38 1.65 7.134 692.68 1180
+Ga Gallium 69.723 1.81 5.907 302.91 2477
+Ge Germanium 72.630 2.01 5.323 1211.4 3106
+As Arsenic 74.922 2.18 5.727 - -
+Se Selenium 78.971 2.55 4.81 494 958
+Br Bromine 79.904 2.96 3.122 265.8 332
+Kr Krypton 83.798 3.00 3.749 115.78 119.93
+Rb Rubidium 85.468 0.82 1.532 312.46 961
+Sr Strontium 87.62 0.95 2.64 1050 1655
+Y Yttrium 88.906 1.22 4.469 1799 3609
+Zr Zirconium 91.224 1.33 6.506 2128 4682
+Nb Niobium 92.906 1.6 8.57 2750 5017
+Mo Molybdenum 95.95 2.16 10.22 2896 4912
+Tc Technetium [98] 1.9 11 2430 4538
+Ru Ruthenium 101.07 2.2 12.37 2607 4423
+Rh Rhodium 102.91 2.28 12.41 2237 3968
+Pd Palladium 106.42 2.20 12.02 1828.05 3236
+Ag Silver 107.87 1.93 10.501 1234.93 2435
+Cd Cadmium 112.41 1.69 8.69 594.22 1040
+In Indium 114.82 1.78 7.31 429.75 2345
+Sn Tin 118.71 1.96 7.287 505.08 2875
+Sb Antimony 121.76 2.05 6.685 903.78 1860
+Te Tellurium 127.60 2.1 6.232 722.66 1261
+I Iodine 126.90 2.66 4.93 386.85 457.4
+Xe Xenon 131.29 2.6 5.894 161.4 165.05
+Cs Caesium 132.91 0.79 1.873 301.59 944
+Ba Barium 137.33 0.89 3.594 1000 2170
+La Lanthanum 138.91 1.10 6.145 1193 3737
+Ce Cerium 140.12 1.12 6.77 1068 3716
+Pr Praseodymium 140.91 1.13 6.773 1208 3793
+Nd Neodymium 144.24 1.14 7.007 1297 3347
+Pm Promethium [145] - 7.26 1315 3273
+Sm Samarium 150.36 1.17 7.52 1345 2067
+Eu Europium 151.96 - 5.243 1099 1802
+Gd Gadolinium 157.25 1.20 7.895 1585 3546
+Tb Terbium 158.93 - 8.229 1629 3503
+Dy Dysprosium 162.50 1.22 8.55 1680 2840
+Ho Holmium 164.93 1.23 8.795 1734 2993
+Er Erbium 167.26 1.24 9.066 1802 3141
+Tm Thulium 168.93 1.25 9.321 1818 2223
+Yb Ytterbium 173.05 - 6.965 1097 1469
+Lu Lutetium 174.97 1.27 9.84 1925 3675
+Hf Hafnium 178.49 1.3 13.31 2506 4876
+Ta Tantalum 180.95 1.5 16.654 3290 5731
+W Tungsten 183.84 2.36 19.25 3695 5828
+Re Rhenium 186.21 1.9 21.02 3459 5869
+Os Osmium 190.23 2.2 22.59 3306 5285
+Ir Iridium 192.22 2.20 22.56 2719 4701
+Pt Platinum 195.08 2.28 21.45 2041.4 4098
+Au Gold 196.97 2.54 19.282 1337.33 3129
+Hg Mercury 200.59 2.00 13.534 234.32 629.88
+Tl Thallium 204.38 1.62 11.85 577 1746
+Pb Lead 207.2 2.33 11.342 600.61 2022
+Bi Bismuth 208.98 2.02 9.807 544.4 1837
+Po Polonium [209] 2.0 9.32 527 1235
+At Astatine [210] 2.2 - 575 -
+Rn Radon [222] 2.2 9.73 202 211.3
+Fr Francium [223] 0.79 - - -
+Ra Radium [226] 0.9 5 973 2010
+Ac Actinium [227] 1.1 10.07 1323 3471
+Th Thorium 232.04 1.3 11.72 2115 5061
+Pa Protactinium 231.04 1.5 15.37 1841 -
+U Uranium 238.03 1.38 18.95 1405.3 4404
+Np Neptunium [237] 1.36 20.45 917 4273
+Pu Plutonium [244] 1.28 19.84 912.5 3501
+Am Americium [243] 1.3 13.69 1449 2880
+Cm Curium [247] 1.3 13.51 1613 3383
+Bk Berkelium [247] 1.3 14.78 1259 -
+Cf Californium [251] 1.3 15.1 1173 1743
+Es Einsteinium [252] 1.3 8.84 1133 -
+Fm Fermium [257] 1.3 - 1800 -
+Md Mendelevium [258] 1.3 - 1100 -
+No Nobelium [259] 1.3 - 1100 -
+Lr Lawrencium [266]
+Rf Rutherfordium [267]
+Db Dubnium [268]
+Sg Seaborgium [269]
+Bh Bohrium [270]
+Hs Hassium [269]
+Mt Meitnerium [278]
+Ds Darmstadtium [281]
+Rg Roentgenium [282]
+Cn Copernicium [285]
+Nh Nihonium [286]
+Fl Flerovium [289]
+Mc Moscovium [290]
+Lv Livermorium [293]
+Ts Tennessine [294]
+Og Oganesson [294]`.split('\n');
+
+const $=s=>document.querySelector(s),rnd=n=>Math.floor(Math.random()*n);
+const CATS=['Alkali metals','Alkaline earth metals','Transition metals','Post-transition metals','Metalloids','Reactive nonmetals','Halogens','Noble gases','Lanthanides','Actinides'];
+const S=[1,3,11,19,37,55,87],U='Unknown',NE='Not established',GAS=[1,2,7,8,9,10,17,18,36,54,86];
+const cat=z=>{const h=s=>s.split(' ').includes(''+z);
+ if(z>=57&&z<=71)return 8;if(z>=89&&z<=103)return 9;
+ if(h('3 11 19 37 55 87'))return 0;if(h('4 12 20 38 56 88'))return 1;
+ if(h('5 14 32 33 51 52'))return 4;if(h('1 6 7 8 15 16 34'))return 5;
+ if(h('9 17 35 53 85 117'))return 6;if(h('2 10 18 36 54 86 118'))return 7;
+ if(h('13 31 49 50 81 82 83 84 113 114 115 116'))return 3;return 2};
+function pos(z){const p=S.filter(s=>s<=z).length,i=z-S[p-1];let c,r=p,f=0;
+ if(p<2)c=i?18:1;else if(p<4)c=i<2?i+1:i+11;else if(p<6)c=i+1;
+ else if(i<2)c=i+1;else if(i<17){c=i+1;r=p+3;f=1}else c=i-13;
+ return{p,r,c,f}}
+const v=x=>x==null||x=='-'?null:+x;
+const E=DATA.map((l,i)=>{const[s,n,m,e,d,mp,bp]=l.split(' '),z=i+1,P=pos(z);
+ return{z,s,n,m,e:v(e),d:v(d),mp:v(mp),bp:v(bp),k:cat(z),...P,b:P.f?'f':(P.c<3||z==2)?'s':P.c>12?'p':'d'}});
+
+// Electron configurations: Madelung filling + known exceptions
+const ORB=[[1,0],[2,0],[2,1],[3,0],[3,1],[4,0],[3,2],[4,1],[5,0],[4,2],[5,1],[6,0],[4,3],[5,2],[6,1],[7,0],[5,3],[6,2],[7,1]];
+const CORE=[[86,15,'Rn'],[54,11,'Xe'],[36,8,'Kr'],[18,5,'Ar'],[10,3,'Ne'],[2,1,'He']];
+const EX={24:'[Ar] 3d5 4s1',29:'[Ar] 3d10 4s1',41:'[Kr] 4d4 5s1',42:'[Kr] 4d5 5s1',44:'[Kr] 4d7 5s1',45:'[Kr] 4d8 5s1',46:'[Kr] 4d10',47:'[Kr] 4d10 5s1',57:'[Xe] 5d1 6s2',58:'[Xe] 4f1 5d1 6s2',64:'[Xe] 4f7 5d1 6s2',78:'[Xe] 4f14 5d9 6s1',79:'[Xe] 4f14 5d10 6s1',89:'[Rn] 6d1 7s2',90:'[Rn] 6d2 7s2',91:'[Rn] 5f2 6d1 7s2',92:'[Rn] 5f3 6d1 7s2',93:'[Rn] 5f4 6d1 7s2',96:'[Rn] 5f7 6d1 7s2',103:'[Rn] 5f14 7s2 7p1'};
+function cfg(z){if(EX[z])return EX[z];let r=z,o=[];
+ for(const[n,l]of ORB){const k=Math.min(r,4*l+2);if(!k)break;o.push([n,l,k]);r-=k}
+ const c=CORE.find(c=>c[0]<z);
+ return(c?`[${c[2]}] `:'')+o.slice(c?c[1]:0).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).map(x=>x[0]+'spdf'[x[1]]+x[2]).join(' ')}
+const st=z=>GAS.includes(z)?'Gas':z==35||z==80?'Liquid':z>99||z==85||z==87?U:'Solid';
+function fm(e){const z=e.z,t=x=>x==null?U:`${x} K (${(x-273.15).toFixed(1)} °C)`;
+ return{cfg:cfg(z)+(z>103?' (predicted)':''),en:e.e??NE,den:e.d==null?U:e.d+(GAS.includes(z)?' g/L (0 °C, 1 atm)':' g/cm³'),mp:t(e.mp),bp:t(e.bp),st:st(z),mass:e.m[0]=='['?e.m+' (mass number)':e.m+' u'}}
+
+// Build table
+let h='';
+for(let c=1;c<=18;c++)h+=`<div class="gl" style="grid-area:1/${c+1}" title="Group ${c}">${c}</div>`;
+for(let p=1;p<=7;p++)h+=`<div class="gl" style="grid-area:${p+1}/1" title="Period ${p}">${p}</div>`;
+h+=`<div class="gl" style="grid-area:10/1">Ln</div><div class="gl" style="grid-area:11/1">An</div>
+<div class="ph" style="grid-area:7/4;--cc:var(--c8)">57–71</div><div class="ph" style="grid-area:8/4;--cc:var(--c9)">89–103</div>`;
+E.forEach(e=>h+=`<button class="el" data-z="${e.z}" aria-label="${e.n}, atomic number ${e.z}" style="grid-area:${e.r+1}/${e.c+1};--cc:var(--c${e.k});--i:${e.z}"><span class="n">${e.z}</span><b>${e.s}</b><span class="nm">${e.n}</span><span class="ms">${e.m}</span></button>`);
+const pt=$('#pt'),q=$('#q'),msg=$('#msg'),dlg=$('#dlg'),tip=$('#tip');
+pt.innerHTML=h;
+const els=[...pt.querySelectorAll('.el')];
+$('#lgd').innerHTML=CATS.map((c,k)=>`<button class="lg" data-k="${k}" style="--cc:var(--c${k})"><i></i>${c}</button>`).join('')+'<button id="rs">Reset view</button>';
+
+let F=null,H=[];
+function refresh(){els.forEach((b,i)=>{const e=E[i],off=(F!=null&&e.k!=F)||(H.length&&!H.includes(e.z));b.classList.toggle('dim',!!off);b.classList.toggle('hit',H.includes(e.z))});
+ document.querySelectorAll('.lg').forEach(b=>b.classList.toggle('on',+b.dataset.k===F))}
+const sel=z=>{els.forEach(b=>b.classList.remove('sel'));els[z-1].classList.add('sel')};
+const reveal=z=>els[z-1].scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+const show=h=>{dlg.innerHTML='<div class="in"><button class="x" aria-label="Close" onclick="dlg.close()">✕</button>'+h+'</div>';dlg.open||dlg.showModal()};
+dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+
+// Info panel
+function info(z){if(z<1||z>118)return;sel(z);const e=E[z-1],f=fm(e),br=e.m[0]=='[',
+ n=Math.round(parseFloat(e.m.replace(/[\[\]]/g,'')))-z;
+ const R=[['Atomic number',z],['Atomic mass',br?`${e.m} – mass number of the most stable known isotope (no standard atomic weight)`:e.m+' u'],['Category',CATS[e.k]],['Period',e.p],['Group',e.f?'Not applicable (f-block)':e.c],['Block',e.b],['Electron configuration',f.cfg],['Protons',z],['Electrons (neutral atom)',z],['Neutrons',n+(br?' (most stable isotope)':' (reference: rounded atomic mass − Z)')],['Electronegativity (Pauling)',f.en],['Density',f.den],['Melting point',f.mp],['Boiling point',f.bp],['State at room temperature',f.st]];
+ show(`<div class="hd" style="--cc:var(--c${e.k})"><div class="tile"><span>${z}</span><b>${e.s}</b></div><div><h2>${e.n}</h2><p>${CATS[e.k]}</p></div></div>
+ <dl>${R.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl>
+ <p class="note">Oxidation states, discovery details, name origins, uses and facts are not included in this edition. “Unknown” and “Not established” mean no value is listed here.</p>
+ <div class="ac"><button onclick="info(${z-1})" ${z<2?'disabled':''}>← Previous</button><button onclick="comp(${z})">Compare</button><button onclick="info(${z+1})" ${z>117?'disabled':''}>Next →</button></div>`)}
+
+// Table interaction
+pt.addEventListener('click',e=>{const b=e.target.closest('.el');if(b)info(+b.dataset.z)});
+pt.addEventListener('mouseover',e=>{const b=e.target.closest('.el');if(!b){tip.hidden=true;return}
+ const x=E[b.dataset.z-1];tip.innerHTML=`<b>${x.n}</b> · No. ${x.z}<br><span>${CATS[x.k]}</span>`;tip.hidden=false});
+pt.addEventListener('mousemove',e=>{if(tip.hidden)return;let X=e.clientX+16,Y=e.clientY+16;
+ if(X+tip.offsetWidth>innerWidth-8)X=e.clientX-tip.offsetWidth-16;if(Y+tip.offsetHeight>innerHeight-8)Y=e.clientY-tip.offsetHeight-16;
+ tip.style.transform=`translate(${X}px,${Y}px)`});
+pt.addEventListener('mouseleave',()=>tip.hidden=true);
+
+// Legend filter
+$('#lgd').addEventListener('click',e=>{const b=e.target.closest('.lg');if(b){F=F==+b.dataset.k?null:+b.dataset.k;refresh()}});
+$('#rs').onclick=()=>{F=null;q.value='';H=[];msg.textContent='';$('#qc').hidden=true;els.forEach(b=>b.classList.remove('sel'));refresh()};
+
+// Search
+const AL={aluminum:13,cesium:55,sulphur:16};
+function find(s){s=s.trim().toLowerCase();if(!s)return[];
+ if(/^\d+$/.test(s))return+s>=1&&+s<=118?[+s]:[];
+ const x=E.filter(e=>e.s.toLowerCase()==s||e.n.toLowerCase()==s).map(e=>e.z);if(AL[s])x.push(AL[s]);
+ return x.length?x:E.filter(e=>e.n.toLowerCase().startsWith(s)).map(e=>e.z)}
+q.addEventListener('input',()=>{const t=q.value.trim();H=find(t);$('#qc').hidden=!t;
+ msg.textContent=!t?'':!H.length?`No element matches “${t}”. Try a name, symbol or atomic number (1–118).`:H.length>1?`${H.length} matches highlighted. Press Enter to open the first.`:`Found ${E[H[0]-1].n}. Press Enter to open its details.`;
+ refresh();if(H[0])reveal(H[0])});
+q.addEventListener('keydown',e=>{if(e.key=='Enter'&&H[0]){info(H[0]);reveal(H[0])}});
+$('#qc').onclick=()=>{q.value='';q.dispatchEvent(new Event('input'));q.focus()};
+
+// Random
+$('#rn').onclick=()=>{const z=1+rnd(118);q.value='';H=[];$('#qc').hidden=true;msg.textContent='';refresh();reveal(z);info(z)};
+
+// Compare
+let CA=1,CB=8;
+function comp(a){if(a)CA=a;const op=s=>E.map(e=>`<option value="${e.z}"${e.z==s?' selected':''}>${e.z} – ${e.n}</option>`).join('');
+ show(`<h2>Compare elements</h2><div class="cs"><select id="ca" aria-label="First element" onchange="CA=+this.value;ct()">${op(CA)}</select><span>vs</span><select id="cb" aria-label="Second element" onchange="CB=+this.value;ct()">${op(CB)}</select></div><div id="ct" class="tb"></div>`);ct()}
+function ct(){const a=E[CA-1],b=E[CB-1],x=fm(a),y=fm(b);
+ const R=[['Atomic number',a.z,b.z],['Atomic mass',x.mass,y.mass],['Category',CATS[a.k],CATS[b.k]],['Electron configuration',x.cfg,y.cfg],['Electronegativity',x.en,y.en],['Density',x.den,y.den],['Melting point',x.mp,y.mp],['Boiling point',x.bp,y.bp]];
+ $('#ct').innerHTML=`<table><tr><th></th><th>${a.s} · ${a.n}</th><th>${b.s} · ${b.n}</th></tr>${R.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table>`}
+$('#cp').onclick=()=>comp();
+
+// Quiz
+let Q;
+function mkq(){const t=rnd(4),e=E[rnd(118)];let s,a,p;
+ if(t==0){s=`Which element has the symbol “${e.s}”?`;a=e.n;p=()=>E[rnd(118)].n}
+ else if(t==1){s=`Which element has atomic number ${e.z}?`;a=e.n;p=()=>E[rnd(118)].n}
+ else if(t==2){s=`What is the chemical symbol of ${e.n}?`;a=e.s;p=()=>E[rnd(118)].s}
+ else{s=`Which category does ${e.n} belong to?`;a=CATS[e.k];p=()=>CATS[rnd(10)]}
+ const o=new Set([a]);while(o.size<4)o.add(p());return{s,a,o:[...o].sort(()=>Math.random()-.5)}}
+function quiz(){Q={i:0,sc:0,q:Array.from({length:10},mkq),l:[]};qs()}
+function qs(){if(Q.i>=10){
+  show(`<h2>Quiz complete</h2><div class="sc">${Q.sc} / 10</div><p class="mu">${Q.sc>=8?'Excellent work.':Q.sc>=5?'Good effort – keep exploring.':'Keep exploring the table and try again.'}</p>
+  <ul class="rv">${Q.l.map((r,i)=>`<li>${r[3]?'✓':'✗'} <b>${i+1}.</b> ${r[0]}<br><span class="mu">Your answer: ${r[1]}${r[3]?'':' · Correct answer: <b style="color:var(--tx)">'+r[2]+'</b>'}</span></li>`).join('')}</ul>
+  <div class="ac"><button onclick="quiz()">Play again</button><button onclick="dlg.close()">Close</button></div>`);return}
+ const c=Q.q[Q.i];
+ show(`<h2>Element Quiz</h2><p class="mu">Question ${Q.i+1} of 10 · Score ${Q.sc}</p><h3>${c.s}</h3><div class="op">${c.o.map(o=>`<button onclick="qa(this)">${o}</button>`).join('')}</div>`)}
+function qa(b){const c=Q.q[Q.i],ok=b.textContent==c.a;Q.sc+=ok?1:0;Q.l.push([c.s,b.textContent,c.a,ok]);
+ b.parentNode.querySelectorAll('button').forEach(x=>{x.disabled=true;if(x.textContent==c.a)x.classList.add('ok')});if(!ok)b.classList.add('bad');
+ setTimeout(()=>{if(dlg.open){Q.i++;qs()}},900)}
+$('#qz').onclick=quiz;
+
+// About
+$('#ab').onclick=()=>show(`<h2>About</h2><p>Periodic Table Explorer is an interactive reference for all 118 recognised chemical elements. It runs entirely in your browser with no backend or external data.</p>
+<h3>Sources and data information</h3><p>Reference sources for cross-checking: IUPAC (atomic weights and element names), NIST Chemistry WebBook, the Royal Society of Chemistry Periodic Table and PubChem.</p>
+<p class="note">Values here were compiled into this file by hand and have not been independently verified against those sources. Elements without a standard atomic weight show the mass number of the most stable known isotope in square brackets. Electron configurations are generated from the Madelung rule with known exceptions; those for elements 104–118 are predictions. Melting and boiling points are in kelvin (°C shown alongside). Missing values are shown as “Unknown” or “Not established” rather than estimated.</p>`);
+
+// Theme (saved in localStorage)
+const root=document.documentElement,tb=$('#th');
+const setT=t=>{root.dataset.theme=t;tb.textContent=t=='dark'?'☀ Light mode':'🌙 Dark mode'};
+let t0='dark';try{t0=localStorage.getItem('pte-theme')||'dark'}catch(e){}setT(t0);
+tb.onclick=()=>{const t=root.dataset.theme=='dark'?'light':'dark';setT(t);try{localStorage.setItem('pte-theme',t)}catch(e){}};
+</script>
+</body>
+</html>
